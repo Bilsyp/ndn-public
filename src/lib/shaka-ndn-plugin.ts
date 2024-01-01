@@ -135,7 +135,7 @@ export class FileFetcher {
 let vf: any;
 
 /** shaka.extern.SchemePlugin for ndn: scheme. */
-export function NdnPlugin(uri: string, requestType: string) {
+export function NdnPlugin(uri: any, request: any, requestType: any): any {
   const ff = new FileFetcher(vf, uri, requestType);
   return new shaka.util.AbortableOperation(
     vf.queue.add(async () => {

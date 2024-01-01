@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, MutableRefObject } from "react";
+import { useEffect, useState } from "react";
 import shaka from "shaka-player/dist/shaka-player.ui.js";
 import "shaka-player/dist/controls.css";
 import { Myparams, labels } from "@/params";
@@ -16,10 +16,8 @@ interface Player {
   getStats(): Myparams | undefined;
 }
 type UnparseObject = /*unresolved*/ any;
-type VideoRefType = MutableRefObject<HTMLVideoElement | null>;
 
 // Assuming HTMLDivElement is the type of your video container
-type VideoContainerRefType = MutableRefObject<HTMLDivElement | null>;
 
 const Player = () => {
   const [player, setPlayer] = useState<undefined | Player>(undefined);
@@ -30,8 +28,6 @@ const Player = () => {
   );
   const [hasErrorRecord, setHasErrorRecord] = useState<boolean | string>(false);
   const { add, clear, queue } = useQueue<Myparams>([]);
-  const video: VideoRefType = useRef(null);
-  const videoContainer: VideoContainerRefType = useRef(null);
   const isSmallDevice = useMediaQuery("only screen and (max-width : 468px)");
   const { jsonToCSV } = usePapaParse();
 
@@ -111,17 +107,16 @@ const Player = () => {
       shaka.net.NetworkingEngine.registerScheme("ndn", NdnPlugin);
 
       const localPlayer = new shaka.Player();
-      await localPlayer.attach(video?.current);
+      const videoContainer: any = document.getElementById("video-container");
+      const video: any = document.getElementById("video");
 
-      const ui = new shaka.ui.Overlay(
-        localPlayer,
-        videoContainer?.current,
-        video.current
-      );
+      await localPlayer.attach(video);
 
-      const controls: shaka.ui.Controls | null = ui.getControls();
+      const ui = new shaka.ui.Overlay(localPlayer, videoContainer, video);
 
-      const player: shaka.Player | null = controls.getPlayer();
+      const controls: any = ui.getControls();
+
+      const player: any = controls.getPlayer();
       setPlayer(player);
       ui.configure({
         castReceiverAppId: "07AEE832",
@@ -138,15 +133,14 @@ const Player = () => {
           <div className="video-conteiner">
             <div
               data-shaka-player-container
+              id="video-container"
               className=" w-full border-[2px] rounded-md border-gray-500 "
-              ref={videoContainer}
               data-shaka-player-cast-receiver-id="07AEE832"
             >
               <video
                 onTimeUpdate={handleTimeUpdate}
                 height={519}
                 data-shaka-player
-                ref={video}
                 id="video"
                 className="w-full "
               ></video>
