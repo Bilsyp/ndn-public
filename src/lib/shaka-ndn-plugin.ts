@@ -23,19 +23,7 @@ async function connRouter(pref: string): Promise<any> {
     throw new Error(error);
   }
 }
-// async function coonNetwork(): Promise<any> {
-//   try {
-//     const face = await connectToNetwork({
-//       H3Transport,
-//       preferH3: true,
-//       fallback: ["suns.cs.ucla.edu", "vnetlab.gcom.di.uminho.pt"],
-//       testConnectionTimeout: 6000,
-//     });
-//     return face;
-//   } catch (error: any | unknown) {
-//     throw new Error(error);
-//   }
-// }
+
 export async function connection(pref: string): Promise<any> {
   try {
     const router = await connRouter(pref);

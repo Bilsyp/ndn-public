@@ -19,13 +19,17 @@ const Connection: React.FC<ConnectionProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(false);
   async function conn(): Promise<void> {
     setLoading(true);
+
     try {
-      const response = await fetch("https://ndn-fch.named-data.net/");
-      const result = await response.text();
-      const url: string = `wss://${result}/ws/`;
-      setGetRouter(result);
+      // const response = await fetch("https://ndn-fch.named-data.net/");
+      // const result = await response.text();
+      // const url: string = "wss://testbed-ndn-rg.stei.itb.ac.id/ws/";
+      const defaults = "ws://167.205.57.173:9696/ws/";
+
+      setGetRouter(defaults);
       try {
-        const coon = await connection(url);
+        const coon = await connection(defaults);
+        console.log(coon.toString());
         setGetConnection(coon);
         setLoading(false);
         setHasRouterErrorConnection(false);

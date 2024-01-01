@@ -126,7 +126,7 @@ const Player = () => {
     initApp();
   }, []);
   return (
-    <section className="streamvideo px-4 lg:px-5 ">
+    <section className="streamvideo px-1 lg:px-5 ">
       {isSmallDevice && <Accordions />}
       <Connection>
         <div className="text-[#FEF4F4] my-20  lg:grid grid-cols-2 overflow-clip">
