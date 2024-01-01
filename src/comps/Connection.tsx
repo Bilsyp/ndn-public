@@ -21,14 +21,14 @@ const Connection: React.FC<ConnectionProps> = ({ children }) => {
     setLoading(true);
 
     try {
-      // const response = await fetch("https://ndn-fch.named-data.net/");
-      // const result = await response.text();
-      // const url: string = "wss://testbed-ndn-rg.stei.itb.ac.id/ws/";
-      const defaults = "ws://167.205.57.173:9696/ws/";
+      const response = await fetch("https://ndn-fch.named-data.net/");
+      const result = await response.text();
+      const url: string = `wss://${result}/ws/`;
+      // const defaults = "ws://167.205.57.173:9696/ws/";
 
-      setGetRouter(defaults);
+      setGetRouter(url);
       try {
-        const coon = await connection(defaults);
+        const coon = await connection(url);
         console.log(coon.toString());
         setGetConnection(coon);
         setLoading(false);
@@ -47,7 +47,7 @@ const Connection: React.FC<ConnectionProps> = ({ children }) => {
     conn();
   }, []);
   return (
-    <div className="container lg:px-2 my-4">
+    <div className="containers px-3 lg:px-2 my-4">
       <div className=" flex justify-between gap-4 my-3">
         <Alert className="lg:w-[50%] dark:bg-transparent text-md ">
           <AlertTitle>

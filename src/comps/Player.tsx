@@ -8,7 +8,7 @@ import Stats from "./Stats";
 import OptionsButton from "./OptionsButton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Accordions from "./Accordion";
-import { useQueue, useMediaQuery } from "@uidotdev/usehooks";
+import { useQueue } from "@uidotdev/usehooks";
 import { usePapaParse } from "react-papaparse";
 import Skeletons from "./Skeleton";
 interface Player {
@@ -28,7 +28,7 @@ const Player = () => {
   );
   const [hasErrorRecord, setHasErrorRecord] = useState<boolean | string>(false);
   const { add, clear, queue } = useQueue<Myparams>([]);
-  const isSmallDevice = useMediaQuery("only screen and (max-width : 468px)");
+  // const isSmallDevice = useMediaQuery("only screen and (max-width : 468px)");
   const { jsonToCSV } = usePapaParse();
 
   const handlePlay = async (): Promise<void> => {
@@ -127,7 +127,6 @@ const Player = () => {
   }, []);
   return (
     <section className="streamvideo px-1 lg:px-5 ">
-      {isSmallDevice && <Accordions />}
       <Connection>
         <div className="text-[#FEF4F4] my-20  lg:grid grid-cols-2 overflow-clip">
           <div className="video-conteiner">
@@ -180,7 +179,7 @@ const Player = () => {
               handleValue={handleValue}
             />
             <Stats />
-            {!isSmallDevice && <Accordions />}
+            <Accordions />
           </div>
         </div>
       </Connection>

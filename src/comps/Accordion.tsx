@@ -9,7 +9,7 @@ export default function Accordions() {
   return (
     <Skeletons>
       <Accordion
-        className="my-6 lg:my-4  text-slate-900 dark:text-white "
+        className="my-8 lg:my-4  text-slate-900 dark:text-white "
         type="single"
         collapsible
       >
