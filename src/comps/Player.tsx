@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, MutableRefObject } from "react";
 import shaka from "shaka-player/dist/shaka-player.ui.js";
 import "shaka-player/dist/controls.css";
 import { Myparams, labels } from "@/params";
@@ -16,6 +16,10 @@ interface Player {
   getStats(): Myparams | undefined;
 }
 type UnparseObject = /*unresolved*/ any;
+type VideoRefType = MutableRefObject<HTMLVideoElement | null>;
+
+// Assuming HTMLDivElement is the type of your video container
+type VideoContainerRefType = MutableRefObject<HTMLDivElement | null>;
 
 const Player = () => {
   const [player, setPlayer] = useState<undefined | Player>(undefined);
@@ -26,8 +30,8 @@ const Player = () => {
   );
   const [hasErrorRecord, setHasErrorRecord] = useState<boolean | string>(false);
   const { add, clear, queue } = useQueue<Myparams>([]);
-  const video = useRef<null>(null);
-  const videoContainer = useRef<null>(null);
+  const video: VideoRefType = useRef(null);
+  const videoContainer: VideoContainerRefType = useRef(null);
   const isSmallDevice = useMediaQuery("only screen and (max-width : 468px)");
   const { jsonToCSV } = usePapaParse();
 
@@ -107,17 +111,17 @@ const Player = () => {
       shaka.net.NetworkingEngine.registerScheme("ndn", NdnPlugin);
 
       const localPlayer = new shaka.Player();
-      await localPlayer.attach(video.current);
+      await localPlayer.attach(video?.current);
 
       const ui = new shaka.ui.Overlay(
         localPlayer,
-        videoContainer.current,
+        videoContainer?.current,
         video.current
       );
 
-      const controls = ui.getControls();
+      const controls: shaka.ui.Controls | null = ui.getControls();
 
-      const player = controls.getPlayer();
+      const player: shaka.Player | null = controls.getPlayer();
       setPlayer(player);
       ui.configure({
         castReceiverAppId: "07AEE832",
