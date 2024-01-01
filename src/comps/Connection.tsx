@@ -33,6 +33,7 @@ const Connection: React.FC<ConnectionProps> = ({ children }) => {
       } catch (error: unknown | any) {
         setHasRouterErrorConnection(error.message);
         setLoading(false);
+        setHasRouterError(false);
       }
     } catch (error: unknown | any) {
       setHasRouterError(error.message);
