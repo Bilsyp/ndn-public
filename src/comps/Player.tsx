@@ -25,8 +25,8 @@ const Player = () => {
   );
   const [content, setContent] = useState<string>("");
   const [loadContent, setLoadContent] = useState<boolean>(false);
-  const [hasErrorloadVideo, setHasErrorLoadVideo] = useState<null | string>(
-    null
+  const [hasErrorloadVideo, setHasErrorLoadVideo] = useState<boolean | string>(
+    false
   );
   const [hasErrorRecord, setHasErrorRecord] = useState<boolean | string>(false);
   const { add, clear, queue } = useQueue<Myparams>([]);
@@ -39,55 +39,53 @@ const Player = () => {
 
       await player?.load(`ndn:/itb/video/${content}/playlist.mpd`);
       clear();
-      setHasErrorLoadVideo(null);
+      setHasErrorLoadVideo(false);
       setLoadContent(false);
+      setHasErrorRecord(false);
     } catch (error: unknown | any) {
-      setHasErrorLoadVideo(error.message);
+      setHasErrorLoadVideo(true);
+      setHasErrorRecord(true);
       setLoadContent(false);
     }
   };
 
   const handleTimeUpdate = async (): Promise<void> => {
-    try {
-      const stats: any = player?.getStats();
-      if (stats) {
-        const {
-          rtte: { sRtt, rto },
-        } = NdnPlugin.getInternals();
-        labels.forEach((item) => {
-          const element: Element | null = document.querySelector(`#${item}`);
-          if (element) {
-            element.textContent =
-              item == "rtt"
-                ? formatInt(sRtt)
-                : item == "rto"
-                ? formatInt(rto)
-                : item == "estimatedBandwidth"
-                ? formatInt(stats["estimatedBandwidth"] / 1024)
-                : item == "streamBandwidth"
-                ? formatInt(stats["streamBandwidth"] / 1024)
-                : item == "loadLatency"
-                ? formatInt(stats["loadLatency"] * 1000)
-                : formatInt(stats[item]);
-          }
-        });
-        add({
-          width: stats["width"],
-          height: stats["height"],
-          loadLatency: formatInt(stats["loadLatency"] * 1000),
-          streamBandwidth: formatInt(stats["streamBandwidth"] / 1024),
-          estimatedBandwidth: formatInt(stats["estimatedBandwidth"] / 1024),
-          decodedFrames: formatInt(stats["decodedFrames"]),
-          droppedFrames: formatInt(stats["droppedFrames"]),
-          bufferingTime: formatInt(stats["bufferingTime"]),
-          playTime: formatInt(stats["playTime"]),
-          pauseTime: formatInt(stats["pauseTime"]),
-          rtt: formatInt(sRtt),
-          rto: formatInt(rto),
-        });
-      }
-    } catch (error: unknown | any) {
-      setHasErrorRecord(error.message);
+    const stats: any = player?.getStats();
+    if (stats) {
+      const {
+        rtte: { sRtt, rto },
+      } = NdnPlugin.getInternals();
+      labels.forEach((item) => {
+        const element: Element | null = document.querySelector(`#${item}`);
+        if (element) {
+          element.textContent =
+            item == "rtt"
+              ? formatInt(sRtt)
+              : item == "rto"
+              ? formatInt(rto)
+              : item == "estimatedBandwidth"
+              ? formatInt(stats["estimatedBandwidth"] / 1024)
+              : item == "streamBandwidth"
+              ? formatInt(stats["streamBandwidth"] / 1024)
+              : item == "loadLatency"
+              ? formatInt(stats["loadLatency"] * 1000)
+              : formatInt(stats[item]);
+        }
+      });
+      add({
+        width: stats["width"],
+        height: stats["height"],
+        loadLatency: formatInt(stats["loadLatency"] * 1000),
+        streamBandwidth: formatInt(stats["streamBandwidth"] / 1024),
+        estimatedBandwidth: formatInt(stats["estimatedBandwidth"] / 1024),
+        decodedFrames: formatInt(stats["decodedFrames"]),
+        droppedFrames: formatInt(stats["droppedFrames"]),
+        bufferingTime: formatInt(stats["bufferingTime"]),
+        playTime: formatInt(stats["playTime"]),
+        pauseTime: formatInt(stats["pauseTime"]),
+        rtt: formatInt(sRtt),
+        rto: formatInt(rto),
+      });
     }
   };
 
@@ -158,7 +156,7 @@ const Player = () => {
                 </AlertDescription>
               </Alert>
             )}
-            {!hasErrorRecord && (
+            {hasErrorRecord && (
               <Skeletons>
                 <Alert
                   className="my-3   text-yellow-500
