@@ -17,8 +17,6 @@ interface Player {
 }
 type UnparseObject = /*unresolved*/ any;
 
-// Assuming HTMLDivElement is the type of your video container
-
 const Player = () => {
   const [player, setPlayer] = useState<shaka.Player | null | undefined>(
     undefined
