@@ -20,7 +20,9 @@ type UnparseObject = /*unresolved*/ any;
 // Assuming HTMLDivElement is the type of your video container
 
 const Player = () => {
-  const [player, setPlayer] = useState<undefined | Player>(undefined);
+  const [player, setPlayer] = useState<shaka.Player | null | undefined>(
+    undefined
+  );
   const [content, setContent] = useState<string>("");
   const [loadContent, setLoadContent] = useState<boolean>(false);
   const [hasErrorloadVideo, setHasErrorLoadVideo] = useState<null | string>(
@@ -48,40 +50,42 @@ const Player = () => {
   const handleTimeUpdate = async (): Promise<void> => {
     try {
       const stats: any = player?.getStats();
-      const {
-        rtte: { sRtt, rto },
-      } = NdnPlugin.getInternals();
-      labels.forEach((item) => {
-        const element: Element | null = document.querySelector(`#${item}`);
-        if (element) {
-          element.textContent =
-            item == "rtt"
-              ? formatInt(sRtt)
-              : item == "rto"
-              ? formatInt(rto)
-              : item == "estimatedBandwidth"
-              ? formatInt(stats["estimatedBandwidth"] / 1024)
-              : item == "streamBandwidth"
-              ? formatInt(stats["streamBandwidth"] / 1024)
-              : item == "loadLatency"
-              ? formatInt(stats["loadLatency"] * 1000)
-              : formatInt(stats[item]);
-        }
-      });
-      add({
-        width: stats["width"],
-        height: stats["height"],
-        loadLatency: formatInt(stats["loadLatency"] * 1000),
-        streamBandwidth: formatInt(stats["streamBandwidth"] / 1024),
-        estimatedBandwidth: formatInt(stats["estimatedBandwidth"] / 1024),
-        decodedFrames: formatInt(stats["decodedFrames"]),
-        droppedFrames: formatInt(stats["droppedFrames"]),
-        bufferingTime: formatInt(stats["bufferingTime"]),
-        playTime: formatInt(stats["playTime"]),
-        pauseTime: formatInt(stats["pauseTime"]),
-        rtt: formatInt(sRtt),
-        rto: formatInt(rto),
-      });
+      if (stats) {
+        const {
+          rtte: { sRtt, rto },
+        } = NdnPlugin.getInternals();
+        labels.forEach((item) => {
+          const element: Element | null = document.querySelector(`#${item}`);
+          if (element) {
+            element.textContent =
+              item == "rtt"
+                ? formatInt(sRtt)
+                : item == "rto"
+                ? formatInt(rto)
+                : item == "estimatedBandwidth"
+                ? formatInt(stats["estimatedBandwidth"] / 1024)
+                : item == "streamBandwidth"
+                ? formatInt(stats["streamBandwidth"] / 1024)
+                : item == "loadLatency"
+                ? formatInt(stats["loadLatency"] * 1000)
+                : formatInt(stats[item]);
+          }
+        });
+        add({
+          width: stats["width"],
+          height: stats["height"],
+          loadLatency: formatInt(stats["loadLatency"] * 1000),
+          streamBandwidth: formatInt(stats["streamBandwidth"] / 1024),
+          estimatedBandwidth: formatInt(stats["estimatedBandwidth"] / 1024),
+          decodedFrames: formatInt(stats["decodedFrames"]),
+          droppedFrames: formatInt(stats["droppedFrames"]),
+          bufferingTime: formatInt(stats["bufferingTime"]),
+          playTime: formatInt(stats["playTime"]),
+          pauseTime: formatInt(stats["pauseTime"]),
+          rtt: formatInt(sRtt),
+          rto: formatInt(rto),
+        });
+      }
     } catch (error: unknown | any) {
       setHasErrorRecord(error.message);
     }
