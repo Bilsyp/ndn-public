@@ -11,12 +11,14 @@ import {
 import HeroPage from "./page/HeroPage";
 import StreamPage from "./page/StreamPage";
 import { ThemeProvider } from "@/components/theme-provider";
+import Chart from "./comps/Chart.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
       <Route path="/" index={true} element={<HeroPage />} />
       <Route path="/streamvideo" element={<StreamPage />} />
+      <Route path="/graphic" element={<Chart />} />
       <Route path="*" element={<h1>404 page</h1>} />
     </Route>
   )

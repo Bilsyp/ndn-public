@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Skeletons from "./Skeleton";
+import { Link } from "react-router-dom";
 interface OptionsButtonProps {
   handlePlay: () => Promise<void>;
   handleValue: (value: string) => void;
@@ -23,7 +24,7 @@ export default function OptionsButton({
 }: OptionsButtonProps) {
   return (
     <Skeletons>
-      <div className="optionButtons dark:text-white flex  flex-wrap gap-5 my-4 lg:my-1 lg:mb-8">
+      <div className="optionButtons dark:text-white flex justify-center lg:justify-start  flex-wrap gap-5 my-4 lg:my-1 lg:mb-8">
         <Select onValueChange={handleValue}>
           <SelectTrigger className="w-[180px] text-slate-800 dark:text-white">
             <SelectValue className="" placeholder="Content" />
@@ -47,9 +48,10 @@ export default function OptionsButton({
             "Load Video"
           )}
         </Button>
-        <Button className=" " onClick={handleRecord}>
-          Record Video
-        </Button>
+        <Button onClick={handleRecord}>Record Video</Button>
+        <Link to={"/graphic"}>
+          <Button>Chart Video</Button>
+        </Link>
       </div>
     </Skeletons>
   );
