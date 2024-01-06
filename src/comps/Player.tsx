@@ -28,7 +28,6 @@ const Player = () => {
   );
   const [hasErrorRecord, setHasErrorRecord] = useState<boolean | string>(false);
   const { add, clear, queue } = useQueue<Myparams>([]);
-  // const isSmallDevice = useMediaQuery("only screen and (max-width : 468px)");
   const { jsonToCSV } = usePapaParse();
 
   const handlePlay = async (): Promise<void> => {

@@ -51,7 +51,6 @@ function Chart() {
         data: Array.isArray(last)
           ? [...(last?.map((items) => items?.[selected]) || [])]
           : [],
-        fill: true,
       },
     ],
   };
