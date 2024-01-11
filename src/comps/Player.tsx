@@ -1,53 +1,57 @@
 import { useEffect, useState } from "react";
+import { NdnPlugin, formatInt } from "@/lib/shaka-ndn-plugin";
+import { Myparams, labels } from "@/params";
+import { usePapaParse } from "react-papaparse";
+import { useQueue } from "@uidotdev/usehooks";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import shaka from "shaka-player/dist/shaka-player.ui.js";
 import "shaka-player/dist/controls.css";
-import { Myparams, labels } from "@/params";
-import { NdnPlugin, formatInt } from "@/lib/shaka-ndn-plugin";
 import Connection from "./Connection";
 import Stats from "./Stats";
 import OptionsButton from "./OptionsButton";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Accordions from "./Accordion";
-import { useQueue } from "@uidotdev/usehooks";
-import { usePapaParse } from "react-papaparse";
 import Skeletons from "./Skeleton";
-interface Player {
-  load(url: string): void;
-  getStats(): Myparams | undefined;
-}
-type UnparseObject = /*unresolved*/ any;
 
 const Player = () => {
-  const [player, setPlayer] = useState<shaka.Player | null | undefined>(
-    undefined
-  );
+  const [player, setPlayer] = useState<shaka.Player | null>()!;
+  const { add, clear, queue } = useQueue<Myparams>([]);
   const [content, setContent] = useState<string>("");
   const [loadContent, setLoadContent] = useState<boolean>(false);
   const [hasErrorloadVideo, setHasErrorLoadVideo] = useState<boolean | string>(
     false
   );
   const [hasErrorRecord, setHasErrorRecord] = useState<boolean | string>(false);
-  const { add, clear, queue } = useQueue<Myparams>([]);
   const { jsonToCSV } = usePapaParse();
+  const handleValue = (selected: string) => setContent(selected);
 
-  const handlePlay = async (): Promise<void> => {
+  const handleLoadVideo = async (): Promise<void> => {
     try {
       setLoadContent(true);
-
       await player?.load(`ndn:/itb/video/${content}/playlist.mpd`);
       clear();
-      setHasErrorLoadVideo(false);
       setLoadContent(false);
+      setHasErrorLoadVideo(false);
       setHasErrorRecord(false);
-    } catch (error: unknown | any) {
+    } catch (error) {
       setHasErrorLoadVideo(true);
       setHasErrorRecord(true);
       setLoadContent(false);
     }
   };
-
-  const handleTimeUpdate = async (): Promise<void> => {
-    const stats: any = player?.getStats();
+  const handleRecord = (): void => {
+    const obj: unknown[] | any = JSON.stringify(queue);
+    const csv = jsonToCSV(obj);
+    const blob: Blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url: string = URL.createObjectURL(blob);
+    const a: HTMLAnchorElement = document.createElement("a");
+    a.href = url;
+    a.download = "Record_data.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+  const handleTimeUpdate = () => {
+    const stats: shaka.extern.Stats | any = player?.getStats();
     if (stats) {
       const {
         rtte: { sRtt, rto },
@@ -85,42 +89,48 @@ const Player = () => {
       });
     }
   };
-
-  const handleValue = (selected: string) => setContent(selected);
-  const handleRecord = (): void => {
-    const obj: string | unknown[] | UnparseObject = JSON.stringify(queue);
-    const csv: string = jsonToCSV(obj);
-    const blob: Blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url: string = URL.createObjectURL(blob);
-    const a: HTMLAnchorElement = document.createElement("a");
-    a.href = url;
-    a.download = "Record_data.csv";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
   useEffect(() => {
-    async function initApp(): Promise<void> {
-      shaka.polyfill.installAll();
-      shaka.net.NetworkingEngine.registerScheme("ndn", NdnPlugin);
+    async function initPlayer() {
+      const video: HTMLMediaElement | any = document.getElementById("video");
 
-      const localPlayer = new shaka.Player();
-      const videoContainer: any = document.getElementById("video-container");
-      const video: any = document.getElementById("video");
+      const videoContainer: HTMLElement =
+        document.getElementById("video-container")!;
 
-      await localPlayer.attach(video);
+      const player: shaka.Player = new shaka.Player();
+      await player.attach(video, true);
 
-      const ui = new shaka.ui.Overlay(localPlayer, videoContainer, video);
+      const ui: shaka.ui.Overlay = new shaka.ui.Overlay(
+        player,
+        videoContainer,
+        video
+      );
+      const controls: shaka.ui.Controls = ui.getControls()!;
 
-      const controls: any = ui.getControls();
-
-      const player: any = controls.getPlayer();
-      setPlayer(player);
+      const players = controls?.getPlayer();
+      setPlayer(players);
       ui.configure({
+        // Set the castReceiverAppId
         castReceiverAppId: "07AEE832",
+        // Enable casting to native Android Apps (e.g. Android TV Apps)
         castAndroidReceiverCompatible: true,
+        seekBarColors: {
+          base: "rgba(255, 255, 255, 0.3)",
+          buffered: "rgba(255, 255, 255, 0.54)",
+          played: "red",
+        },
+        seekOnTaps: true,
       });
+    }
+    function initApp() {
+      if (shaka.Player.isBrowserSupported()) {
+        // Everything looks good!
+        shaka.polyfill.installAll();
+        shaka.net.NetworkingEngine.registerScheme("ndn", NdnPlugin);
+        initPlayer();
+      } else {
+        // This browser does not have the minimum set of APIs we need.
+        console.error("Browser not supported!");
+      }
     }
     initApp();
   }, []);
@@ -157,8 +167,8 @@ const Player = () => {
               <Skeletons>
                 <Alert
                   className="my-3   text-yellow-500
-      
-      )]"
+    
+    )}"
                 >
                   <AlertTitle>Warning</AlertTitle>
                   <AlertDescription>
@@ -174,7 +184,7 @@ const Player = () => {
             <OptionsButton
               handleRecord={handleRecord}
               loadContent={loadContent}
-              handlePlay={handlePlay}
+              handlePlay={handleLoadVideo}
               handleValue={handleValue}
             />
             <Stats />
@@ -185,5 +195,4 @@ const Player = () => {
     </section>
   );
 };
-
 export default Player;
