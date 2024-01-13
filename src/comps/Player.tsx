@@ -11,6 +11,7 @@ import Stats from "./Stats";
 import OptionsButton from "./OptionsButton";
 import Accordions from "./Accordion";
 import Skeletons from "./Skeleton";
+import { config } from "@/lib/config";
 
 const Player = () => {
   const [player, setPlayer] = useState<shaka.Player | null>()!;
@@ -105,7 +106,7 @@ const Player = () => {
 
       const player: shaka.Player = new shaka.Player();
       await player.attach(video, true);
-
+      player.configure(config);
       const ui: shaka.ui.Overlay = new shaka.ui.Overlay(
         player,
         videoContainer,
