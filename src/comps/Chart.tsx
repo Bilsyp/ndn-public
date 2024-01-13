@@ -102,7 +102,7 @@ function Chart() {
       </CSVReader>
       <div className="files flex gap-4 ">
         {title.map((item) => (
-          <Card>
+          <Card key={item}>
             <CardHeader>
               <CardTitle className="text-[0.89rem]">{item}</CardTitle>
             </CardHeader>

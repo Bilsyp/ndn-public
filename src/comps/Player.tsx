@@ -56,6 +56,10 @@ const Player = () => {
       const {
         rtte: { sRtt, rto },
       } = NdnPlugin.getInternals();
+
+      const delay =
+        stats?.loadLatency + stats?.streamBandwidth / stats?.estimatedBandwidth;
+
       labels.forEach((item) => {
         const element: Element | null = document.querySelector(`#${item}`);
         if (element) {
@@ -70,6 +74,8 @@ const Player = () => {
               ? formatInt(stats["streamBandwidth"] / 1024)
               : item == "loadLatency"
               ? formatInt(stats["loadLatency"] * 1000)
+              : item == "delay"
+              ? formatInt(delay * 1000)
               : formatInt(stats[item]);
         }
       });
@@ -86,6 +92,7 @@ const Player = () => {
         pauseTime: formatInt(stats["pauseTime"]),
         rtt: formatInt(sRtt),
         rto: formatInt(rto),
+        delay: formatInt(delay * 1000),
       });
     }
   };
@@ -118,7 +125,6 @@ const Player = () => {
           buffered: "rgba(255, 255, 255, 0.54)",
           played: "red",
         },
-        seekOnTaps: true,
       });
     }
     function initApp() {
