@@ -41,13 +41,13 @@ function Chart() {
     labels: Array.from({ length: persamaa() }, (_, index) => index + 1),
     datasets: [
       {
-        label: `${title[0]}`,
+        label: `${title[0]?.toLowerCase()}`,
         data: Array.isArray(first)
           ? [...(first?.map((items) => items?.[selected]) || [])]
           : [],
       },
       {
-        label: `${title[1]}`,
+        label: `${title[1]?.toLowerCase()}`,
         data: Array.isArray(last)
           ? [...(last?.map((items) => items?.[selected]) || [])]
           : [],
